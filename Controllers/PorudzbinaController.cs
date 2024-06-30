@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Poslasticarnica.Configuration;
 using Poslasticarnica.Core;
 using Poslasticarnica.Model;
+using Stripe;
+using Stripe.Checkout;
 using System.Data;
 
 namespace Poslasticarnica.Controllers
@@ -15,14 +17,6 @@ namespace Poslasticarnica.Controllers
         public PorudzbinaController(ProjectConfiguration configuration, IKorisnikService userService) : base(configuration, userService)
         {
 
-        }
-
-
-        [Authorize(Roles = "Prodavac")]
-        [HttpGet("all")]
-        public override IActionResult GetAll([FromQuery] int page, [FromQuery] int perPage, [FromQuery] string sort, [FromQuery] string direction)
-        {
-            return Ok(_baseService.GetAll(page, perPage, sort, direction));
         }
 
         [Authorize(Roles = "Kupac")]
@@ -73,6 +67,33 @@ namespace Poslasticarnica.Controllers
 
             }
             return Ok(entity);
+        }
+
+        [HttpPost("webhook")]
+        public async Task<ActionResult> Index()
+        {
+            var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
+            var stripeEvent = EventUtility.ConstructEvent(json, Request.Headers["Stripe-Signature"], "whsec_SWD3YE07Isi3iyGQOdvTHPFxHAFXv9VS");
+
+            if (stripeEvent.Type == Events.CheckoutSessionAsyncPaymentSucceeded)
+            {
+
+            }
+            else if (stripeEvent.Type == Events.CheckoutSessionAsyncPaymentFailed)
+            {
+
+            }
+            else if (stripeEvent.Type == Events.CheckoutSessionCompleted)
+            {
+                Session? session = stripeEvent.Data.Object as Session;
+                _baseService.Add(new Poslasticarnica.Model.KorisnikController { KID = long.Parse(session.Metadata["korisnikId"]), DatumVremePorudzbine = DateTime.Parse(session.Metadata["datumVremePorudzbine"]) });
+            }
+            else if (stripeEvent.Type == Events.CheckoutSessionExpired)
+            {
+
+            }
+
+            return Ok();
         }
 
     }

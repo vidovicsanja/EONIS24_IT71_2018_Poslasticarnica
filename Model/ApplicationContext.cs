@@ -44,6 +44,7 @@ namespace Poslasticarnica.Model
             }
 
             optionBuilder.UseSqlServer("Server=LAPTOP-S8BLMRE6\\SQLEXPRESS;Database=PoslasticarnicaERP2;Trusted_Connection=True;");
+            
         }
     }
 }

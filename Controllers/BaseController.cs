@@ -41,7 +41,7 @@ namespace Poslasticarnica.Controllers
             return Ok(entity);
         }
 
-        [Authorize(Roles = "Kupac, Prodavac")]
+        // [Authorize(Roles = "Kupac, Prodavac")]
         [HttpGet("all")]
         public virtual IActionResult GetAll([FromQuery] int page, [FromQuery] int perPage, [FromQuery] string? sort, [FromQuery] string? direction)
         {

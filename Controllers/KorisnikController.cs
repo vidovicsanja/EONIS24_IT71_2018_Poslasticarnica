@@ -20,45 +20,13 @@ namespace Poslasticarnica.Controllers
 
         }
 
-        [Authorize(Roles = "Prodavac")]
-        [HttpGet("all")]
-        public override IActionResult GetAll([FromQuery] int page, [FromQuery] int perPage, [FromQuery] string sort, [FromQuery] string direction)
-        {
-            return Ok(_baseService.GetAll(page, perPage, sort, direction));
-        }
-
-
         [HttpGet("current")]
-        public  IActionResult GetCurrentAction() 
+        public IActionResult GetCurrentAction()
         {
             Korisnik korisnik = GetCurrentUser();
 
             return Ok(korisnik);
         }
-
-
-        [Authorize(Roles ="Kupac")]
-        [HttpGet("{id}")]
-        public override IActionResult Get(int id)
-        {
-
-            Korisnik korisnik = GetCurrentUser();
-
-            if (korisnik is not null && korisnik.Id != id) 
-            {
-                return BadRequest();
-            }
-
-
-            Korisnik entity = _baseService.Get(id);
-            if (entity == null)
-            {
-                return BadRequest();
-
-            }
-            return Ok(entity);
-        }
-
 
 
         [HttpPost("register")]
@@ -79,40 +47,6 @@ namespace Poslasticarnica.Controllers
             return Ok(k);
         }
 
-        [Authorize(Roles = "Kupac, Prodavac")]
-        [HttpPut("{Id}")]
-        public override IActionResult Update(int Id, Korisnik entity)
-        {
-            if (entity == null)
-            {
-                return BadRequest();
-            }
-            bool response = _baseService.Update(Id, entity);
-
-            return Ok(response);
-        }
-
-
-        //brisanje samo svojih podataka
-        [Authorize(Roles = "Kupac, Prodavac")]
-        [HttpDelete("{Id}")]
-        public virtual IActionResult Delete(int Id)
-        {
-            /*
-            Korisnik korisnik = GetCurrentUser();
-
-            if (korisnik is not null && korisnik.Id != Id)
-            {
-                return BadRequest();
-            }
-            */
-
-            bool response = _baseService.Delete(Id);
-
-            return Ok(response);
-        }
-
-
-
     }
 }
+
