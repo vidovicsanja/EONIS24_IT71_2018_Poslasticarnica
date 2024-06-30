@@ -6,7 +6,10 @@ using Poslasticarnica.Configuration;
 using Poslasticarnica.Core;
 using Poslasticarnica.Model;
 using Poslasticarnica.Service;
+using Stripe.BillingPortal;
 using System.Text;
+using System.Configuration;
+using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,7 +44,7 @@ builder.Services.AddDbContext<ApplicationContext>(optionBuilder => {
 });
 
 builder.Services.AddCors(o => o.AddPolicy("MyPolicy", builder => {
-    builder.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin().Build();
+    builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
 }));
 
 
@@ -55,6 +58,15 @@ builder.Services.AddScoped<IPorudzbinaService, PorudzbinaService>();
 builder.Services.AddScoped<IStavkaPorudzbineService, StavkaPorudzbineService>();
 builder.Services.AddScoped<IPlacanjeService, PlacanjeService>();
 builder.Services.AddScoped<IIsporukaService, IsporukaService>();
+
+// Stripe implementation.
+builder.Services.AddControllersWithViews();
+
+var configuration = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json")
+    .Build();
+
+builder.Services.Configure<StripeSettings>(configuration.GetSection("StripeSettings"));
 
 var app = builder.Build();
 
